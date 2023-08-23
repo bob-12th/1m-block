@@ -103,17 +103,19 @@ bool isMalicousHost(char *host)
         printf("파일을 찾을 수 없습니다.\n");
         return FALSE;
     }
-	printf("hello");
-	char line[256]; // 적절한 크기로 조정
+
+	// parse csv file
+	char line[256];
     std::vector<std::string> dataVector;
     while (fgets(line, sizeof(line), f)) {
-        // 개행 문자 제거
+        
        line[strcspn(line, "\n")] = '\0';
 
         char *token = strtok(line, ",");
         if (token != NULL) {
             token = strtok(NULL, ","); 
             if (token != NULL) {
+				//check val
                 dataVector.push_back(token);
 				std::cout << token << std::endl;
             }
