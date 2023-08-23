@@ -18,6 +18,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #define FALSE 0
 #define TRUE 1
@@ -104,7 +105,7 @@ bool isMalicousHost(char *host)
         return FALSE;
     }
 
-	// parse csv file
+	// parse csv file to vector
 	char line[256];
     std::vector<std::string> dataVector;
     while (fgets(line, sizeof(line), f)) {
@@ -117,11 +118,20 @@ bool isMalicousHost(char *host)
             if (token != NULL) {
 				//check val
                 dataVector.push_back(token);
-				std::cout << token << std::endl;
+				// std::cout << token << std::endl;
             }
         }
     }
 	fclose(f);
+
+	// search vector
+	std::sort(dataVector.begin(), dataVector.end());
+
+    // binary search
+    if (std::binary_search(dataVector.begin(), dataVector.end(), host)) {
+        return true;
+    }
+
 	return FALSE;
 }
 
@@ -192,10 +202,13 @@ void resetIptables()
 void sig_handler(int signal)
 {
 	if (signal == SIGINT) {
-        ctrlC = 1;  // Set the flag indicating Ctrl+C was pressed
-        resetIptables();   // Call the resetIptables function
+		// set the flag indicating Ctrl+C was pressed
+        ctrlC = 1;
+		// call the resetIptables function
+        resetIptables();
         printf("[*] Ctrl+C pressed. stop program...\n");
-        exit(0);  // Exit the program
+		// exit the program
+        exit(0);
     }
 }
 
@@ -213,7 +226,7 @@ int main(int argc, char **argv)
 	int rv;
 	char buf[4096] __attribute__ ((aligned));
 	
-	// set dangerous host
+	// set malicous host list(csv file)
 	malicious_host_path = argv[1];
 
 	printf("[*] opening library handle\n");

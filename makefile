@@ -12,3 +12,5 @@ all: 1m-block
 
 clean:
 	rm -f 1m-block *.o
+	rm -f index.html.*
+	rm -f index.html
