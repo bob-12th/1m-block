@@ -23,8 +23,6 @@
 #define FALSE 0
 #define TRUE 1
 
-
-char* malicious_host;
 int ctrlC = 0;
 char *malicious_host_path;
 
