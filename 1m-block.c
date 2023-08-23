@@ -12,10 +12,17 @@
 #include <netinet/ether.h>  
 #include <string.h>
 #include <signal.h>
+#include <stdbool.h>
+
+#define FALSE 0
+#define TRUE 1
+
 
 char* malicious_host;
 int ctrlC = 0;
+char *malicious_host_path;
 
+// unused
 void dump(unsigned char* buf, int size) {
 	int i;
 	for (i = 0; i < size; i++) {
@@ -83,6 +90,18 @@ static u_int32_t print_pkt (struct nfq_data *tb)
 	return id;
 }
 
+bool isMalicousHost(char *host)
+{
+	FILE *f = fopen(malicious_host_path, "rb");
+    if (f == NULL)
+    {
+        printf("파일을 찾을 수 없습니다.\n");
+        return FALSE;
+    }
+
+	return FALSE;
+}
+
 
 static int cb(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg,
 	      struct nfq_data *nfa, void *data)
@@ -116,7 +135,8 @@ static int cb(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg,
 
 				printf("[*] extracted host from  pkt : %s\n", start_of_host);
 				start_of_host[host_len] = '\0';
-				if( strncmp(start_of_host, malicious_host, host_len) == 0)
+				if (strncmp(start_of_host, malicious_host, host_len) == 0)
+				if (isMalicousHost(start_of_host))
 				{
 					flag = NF_DROP;
 					printf("[*] %s is blocked..\n",start_of_host);
@@ -171,7 +191,7 @@ int main(int argc, char **argv)
 	char buf[4096] __attribute__ ((aligned));
 	
 	// set dangerous host
-	malicious_host = argv[1];
+	malicious_host_path = argv[1];
 
 	printf("[*] opening library handle\n");
 	h = nfq_open();
