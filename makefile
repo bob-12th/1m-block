@@ -1,11 +1,14 @@
+CXX = g++  # C++ 컴파일러 지정
+
 LDLIBS += -lpcap -lnetfilter_queue
 
 all: 1m-block
 
-netfilter-test.o: 1m-block.c
+1m-block.o: 1m-block.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-netfilter-test: 1m-block.o
-	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+1m-block: 1m-block.o
+	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 clean:
 	rm -f 1m-block *.o

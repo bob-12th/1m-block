@@ -13,6 +13,11 @@
 #include <string.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
 
 #define FALSE 0
 #define TRUE 1
@@ -98,7 +103,23 @@ bool isMalicousHost(char *host)
         printf("파일을 찾을 수 없습니다.\n");
         return FALSE;
     }
+	printf("hello");
+	char line[256]; // 적절한 크기로 조정
+    std::vector<std::string> dataVector;
+    while (fgets(line, sizeof(line), f)) {
+        // 개행 문자 제거
+       line[strcspn(line, "\n")] = '\0';
 
+        char *token = strtok(line, ",");
+        if (token != NULL) {
+            token = strtok(NULL, ","); 
+            if (token != NULL) {
+                dataVector.push_back(token);
+				std::cout << token << std::endl;
+            }
+        }
+    }
+	fclose(f);
 	return FALSE;
 }
 
@@ -135,7 +156,7 @@ static int cb(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg,
 
 				printf("[*] extracted host from  pkt : %s\n", start_of_host);
 				start_of_host[host_len] = '\0';
-				if (strncmp(start_of_host, malicious_host, host_len) == 0)
+				// if (strncmp(start_of_host, malicious_host, host_len) == 0)
 				if (isMalicousHost(start_of_host))
 				{
 					flag = NF_DROP;
